@@ -18,27 +18,27 @@ def update_videos(data):
     try:
         if data is None or len(data) != 13:
             return False
-        q = f'''SELECT views, likes, dislikes, comments FROM videos WHERE id == '{data[0]}'''
+        q = f"SELECT id, views, likes, dislikes, comments FROM videos WHERE id = '{data[0]}'"
         cursor.execute(q)
-        data = cursor.fetchall()
+        data2 = cursor.fetchall()
         if data == ():
             # log video isn't in db
             return False
-        q = '''REPLACE INTO  videos
+        q = '''REPLACE INTO videos
                 (id, title, views, likes,
                 dislikes, comments, description,
                 channel_id, duration, published_at,
                 tags, default_language, made_for_kids, time)
                 VALUES
                 (%s, %s, %s, %s, %s, %s,
-                 %s, %s, %s, %s, %s, %s, %s, NOW(), );'''
+                 %s, %s, %s, %s, %s, %s, %s, NOW() );'''
         cursor.execute(q, data)
         q = '''INSERT INTO videos_history
                 (video_id, views, likes,
                 dislikes, comments, update_time)
                 VALUES
-                (%s, %s, %s, %s, %s, NOW(), );'''
-        cursor.execute(q, data)
+                (%s, %s, %s, %s, %s, NOW() );'''
+        cursor.execute(q, data2[0])
         db.commit()
     except Exception as error:
         print(error)
